@@ -1,10 +1,10 @@
 // Import and require mysql2
-const inquirer = require("inquirer");
-const mysql = require("mysql2");
-require("console.table");
+import inquirer from 'inquirer'
+import { createConnection } from "mysql2";
+import 'console.table'
 
 // Connect to database
-const db = mysql.createConnection(
+const db = createConnection(
   {
     host: "localhost",
     // MySQL username,
@@ -25,8 +25,7 @@ function deleteEmployee() {
       };
     });
 
-    inquirer
-      .prompt([
+    inquirer.prompt([
         {
           type: "list",
           name: "employeeId",
@@ -59,8 +58,7 @@ function showEmployees() {
 }
 
 function showOptions() {
-  inquirer
-    .prompt([
+  inquirer.prompt([
       {
         type: "list",
         name: "choice",
