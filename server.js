@@ -2,19 +2,21 @@
 import inquirer from 'inquirer'
 import { createConnection } from "mysql2";
 import 'console.table'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 // Connect to database
+
 const db = createConnection(
   {
     host: "localhost",
     // MySQL username,
     user: "root",
     // MySQL password
-    password: "",
-    database: "employees",
-  },
-  console.log(`Connected to the employee database.`)
-);
+    password: process.env.password,
+    database: "company",
+  }
+)
 
 function deleteEmployee() {
   db.query("SELECT * FROM employee", function (err, results) {
@@ -50,34 +52,38 @@ function deleteEmployee() {
 }
 
 // Query database
-function showEmployees() {
-  db.query("SELECT * FROM employee", function (err, results) {
-    console.table(results);
-    showOptions();
-  });
-}
+const showEmployees = () => {
+	db.promise().query("SELECT * FROM employees;")
+			.then(([rows, fields]) => {
+				console.table(rows);
+				showOptions();
+			})
+		}
 
-function showOptions() {
-  inquirer.prompt([
-      {
-        type: "list",
-        name: "choice",
-        message: "What would you like to do?",
-        choices: ["View All Employees", "Remove Employee", "Quit"],
-      },
-    ])
+
+const questions = [
+	{
+		type: "list",
+		name: "choice",
+		message: "What would you like to do?",
+		choices: ["View All Employees", "Remove Employee", "Quit"],
+	},
+]
+
+const showOptions = () => {
+  inquirer.prompt(questions)
     .then(({ choice }) => {
-      switch (choice) {
+			switch ( choice ) {
         case "View All Employees":
           showEmployees();
           break;
         case "Remove Employee":
           deleteEmployee();
           break;
-        default:
+        case "Quit":
           process.exit();
       }
     });
 }
 
-showOptions();
+showOptions()
