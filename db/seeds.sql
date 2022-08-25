@@ -14,21 +14,21 @@ VALUES
 	("Mechanical Engineer", 80000, 2),
 	("Project Engineer", 100000, 2),
 	("Software Engineer", 120000, 2),
-	("Account Manager", 160000),
-	("Accountant", 120000),
-	("Lawyer", 190000),
-	("Legal Team Lead", 250000);
+	("Account Manager", 160000, 3),
+	("Accountant", 120000, 3),
+	("Lawyer", 190000, 4),
+	("Legal Team Lead", 250000, 4);
 
-INSERT INTO employees (first_name, last_name)
+INSERT INTO employees (first_name, last_name, role_id, department_id)
 VALUES 
-	("Alfred", "Corbett"),
-("Alyx", "Hahn"),
-("Lynda", "Franklin"),
-("Michele", "Molloy"),
-("Jameson", "Sparks"),
-("Adam", "Wilcox"),
-("Hettie", "Cooper"),
-("Alan", "Beard"),
-("Lilith", "Pike"),
-("Shania", "Quinn"),
-("Sophie", "Pace");
+	("Alfred", "Corbett", 1, 1),
+("Alyx", "Hahn", 2, 1),
+("Lynda", "Franklin", 3, 2),
+("Michele", "Molloy", 4, 2),
+("Jameson", "Sparks", 5, 2),
+("Adam", "Wilcox", 6, 2),
+("Hettie", "Cooper", 7, 3),
+("Alan", "Beard", 8, 3),
+("Lilith", "Pike", 9, 4),
+("Shania", "Quinn", 10, 4),
+("Sophie", "Pace", 9, 4);
