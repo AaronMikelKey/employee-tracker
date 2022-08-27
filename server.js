@@ -6,7 +6,6 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 // Connect to database
-
 const db = createConnection(
   {
     host: "localhost",
@@ -18,6 +17,7 @@ const db = createConnection(
   }
 )
 
+// Delete Employee from db
 function deleteEmployee() {
   db.query("SELECT * FROM employee", function (err, results) {
     const choices = results.map(({ id, first_name, last_name }) => {
@@ -51,7 +51,15 @@ function deleteEmployee() {
   });
 }
 
-// Query database
+// TODO: Add function to add department
+
+// TODO: Add function to add role
+
+// TODO: Add function to add employee
+
+// TODO: Add function to update employee role
+
+// Show employees query
 const showEmployees = () => {
 	db.promise().query("SELECT * FROM employees;")
 			.then(([rows, fields]) => {
@@ -60,7 +68,7 @@ const showEmployees = () => {
 			})
 		}
 
-
+// Main menu questions
 const questions = [
 	{
 		type: "list",
@@ -70,6 +78,7 @@ const questions = [
 	},
 ]
 
+// Show options && initial questions
 const showOptions = () => {
   inquirer.prompt(questions)
     .then(({ choice }) => {
