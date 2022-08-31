@@ -13,6 +13,7 @@ const questions = [
     message: "What would you like to do?",
     choices: [
       "View All Departments",
+      "View All Roles",
       "View All Employees",
       "Remove Employee",
       "Quit",
@@ -40,7 +41,17 @@ const showDepartments = () => {
     });
 };
 // TODO: Add function to show all roles
-const showRoles = () => {};
+//job title, role id, the department that role belongs to, and the salary for that role
+const showRoles = () => {
+  db.promise()
+    .query(
+      "SELECT * FROM roles LEFT JOIN departments ON roles.department_id = departments.id;"
+    )
+    .then(([rows, fields]) => {
+      console.table(rows);
+      showOptions();
+    });
+};
 // Show employees query
 const showEmployees = () => {
   db.promise()
@@ -102,6 +113,9 @@ const showOptions = () => {
     switch (choice) {
       case "View All Departments":
         showDepartments();
+        break;
+      case "View All Roles":
+        showRoles();
         break;
       case "View All Employees":
         showEmployees();
