@@ -5,6 +5,16 @@ import 'console.table'
 import * as dotenv from 'dotenv'
 dotenv.config()
 
+// Main menu questions
+const questions = [
+	{
+		type: "list",
+		name: "choice",
+		message: "What would you like to do?",
+		choices: ["View All Employees", "Remove Employee", "Quit"],
+	},
+]
+
 // Connect to database
 const db = createConnection(
   {
@@ -17,8 +27,29 @@ const db = createConnection(
   }
 )
 
+// TODO: Add function to show all departments
+const showDepartments = () => {}
+// TODO: Add function to show all roles
+const showRoles = () => {}
+// Show employees query
+const showEmployees = () => {
+	db.promise().query("SELECT * FROM employees;")
+			.then(([rows, fields]) => {
+				console.table(rows);
+				showOptions();
+			})
+		}
+
+// TODO: Add function to add department
+const addDepartment = () => {}
+// TODO: Add function to add role
+const addRole = () => {}
+// TODO: Add function to add employee
+const addEmployee = () => {}
+// TODO: Add function to update employee role
+const updateRole = () => {}
 // Delete Employee from db
-function deleteEmployee() {
+const deleteEmployee = () => {
   db.query("SELECT * FROM employee", function (err, results) {
     const choices = results.map(({ id, first_name, last_name }) => {
       return {
@@ -50,33 +81,6 @@ function deleteEmployee() {
       });
   });
 }
-
-// TODO: Add function to add department
-
-// TODO: Add function to add role
-
-// TODO: Add function to add employee
-
-// TODO: Add function to update employee role
-
-// Show employees query
-const showEmployees = () => {
-	db.promise().query("SELECT * FROM employees;")
-			.then(([rows, fields]) => {
-				console.table(rows);
-				showOptions();
-			})
-		}
-
-// Main menu questions
-const questions = [
-	{
-		type: "list",
-		name: "choice",
-		message: "What would you like to do?",
-		choices: ["View All Employees", "Remove Employee", "Quit"],
-	},
-]
 
 // Show options && initial questions
 const showOptions = () => {
