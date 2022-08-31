@@ -11,7 +11,12 @@ const questions = [
     type: "list",
     name: "choice",
     message: "What would you like to do?",
-    choices: ["View All Employees", "Remove Employee", "Quit"],
+    choices: [
+      "View All Departments",
+      "View All Employees",
+      "Remove Employee",
+      "Quit",
+    ],
   },
 ];
 
@@ -26,7 +31,14 @@ const db = createConnection({
 });
 
 // TODO: Add function to show all departments
-const showDepartments = () => {};
+const showDepartments = () => {
+  db.promise()
+    .query("SELECT * FROM departments;")
+    .then(([rows, fields]) => {
+      console.table(rows);
+      showOptions();
+    });
+};
 // TODO: Add function to show all roles
 const showRoles = () => {};
 // Show employees query
@@ -88,6 +100,9 @@ const deleteEmployee = () => {
 const showOptions = () => {
   inquirer.prompt(questions).then(({ choice }) => {
     switch (choice) {
+      case "View All Departments":
+        showDepartments();
+        break;
       case "View All Employees":
         showEmployees();
         break;
