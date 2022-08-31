@@ -1,102 +1,103 @@
 // Import and require mysql2
-import inquirer from 'inquirer'
+import inquirer from "inquirer";
 import { createConnection } from "mysql2";
-import 'console.table'
-import * as dotenv from 'dotenv'
-dotenv.config()
+import "console.table";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 // Main menu questions
 const questions = [
-	{
-		type: "list",
-		name: "choice",
-		message: "What would you like to do?",
-		choices: ["View All Employees", "Remove Employee", "Quit"],
-	},
-]
+  {
+    type: "list",
+    name: "choice",
+    message: "What would you like to do?",
+    choices: ["View All Employees", "Remove Employee", "Quit"],
+  },
+];
 
 // Connect to database
-const db = createConnection(
-  {
-    host: "localhost",
-    // MySQL username,
-    user: "root",
-    // MySQL password
-    password: process.env.password,
-    database: "company",
-  }
-)
+const db = createConnection({
+  host: "localhost",
+  // MySQL username,
+  user: "root",
+  // MySQL password
+  password: process.env.password,
+  database: "company",
+});
 
 // TODO: Add function to show all departments
-const showDepartments = () => {}
+const showDepartments = () => {};
 // TODO: Add function to show all roles
-const showRoles = () => {}
+const showRoles = () => {};
 // Show employees query
 const showEmployees = () => {
-	db.promise().query("SELECT * FROM employees;")
-			.then(([rows, fields]) => {
-				console.table(rows);
-				showOptions();
-			})
-		}
+  db.promise()
+    .query("SELECT * FROM employees;")
+    .then(([rows, fields]) => {
+      console.table(rows);
+      showOptions();
+    });
+};
 
 // TODO: Add function to add department
-const addDepartment = () => {}
+const addDepartment = () => {};
 // TODO: Add function to add role
-const addRole = () => {}
+const addRole = () => {};
 // TODO: Add function to add employee
-const addEmployee = () => {}
+const addEmployee = () => {};
 // TODO: Add function to update employee role
-const updateRole = () => {}
+const updateRole = () => {};
 // Delete Employee from db
 const deleteEmployee = () => {
-  db.query("SELECT * FROM employee", function (err, results) {
-    const choices = results.map(({ id, first_name, last_name }) => {
-      return {
-        name: `${first_name} ${last_name}`,
-        value: id,
-      };
-    });
-
-    inquirer.prompt([
-        {
-          type: "list",
-          name: "employeeId",
-          message: "Which employee would you like to remove?",
-          choices: choices,
-        },
-      ])
-      .then(({ employeeId }) => {
-        db.query(
-          `DELETE FROM employee WHERE id = ?`,
-          employeeId,
-          (err, result) => {
-            if (err) {
-              console.log(err);
-            }
-            console.log(result);
-            showOptions();
-          }
-        );
+  db.promise()
+    .query("SELECT * FROM employees")
+    .then(([row, fields]) => {
+      const choices = row.map(({ id, first_name, last_name }) => {
+        return {
+          name: `${first_name} ${last_name}`,
+          value: id,
+        };
       });
-  });
-}
+
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "employeeId",
+            message: "Which employee would you like to remove?",
+            choices: choices,
+          },
+        ])
+        .then(({ employeeId }) => {
+          db.query(
+            `DELETE FROM employees WHERE id = ?`,
+            employeeId,
+            (err, result) => {
+              if (err) {
+                console.log(err);
+              }
+              console.log(result);
+              showOptions();
+            }
+          );
+        });
+    });
+};
 
 // Show options && initial questions
 const showOptions = () => {
-  inquirer.prompt(questions)
-    .then(({ choice }) => {
-			switch ( choice ) {
-        case "View All Employees":
-          showEmployees();
-          break;
-        case "Remove Employee":
-          deleteEmployee();
-          break;
-        case "Quit":
-          process.exit();
-      }
-    });
-}
+  inquirer.prompt(questions).then(({ choice }) => {
+    switch (choice) {
+      case "View All Employees":
+        showEmployees();
+        break;
+      case "Remove Employee":
+        deleteEmployee();
+        break;
+      case "Quit":
+        process.exit();
+    }
+  });
+};
 
-showOptions()
+showOptions();
