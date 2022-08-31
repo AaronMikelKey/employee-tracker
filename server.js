@@ -15,6 +15,7 @@ const questions = [
       "View All Departments",
       "View All Roles",
       "View All Employees",
+      "Add Department",
       "Remove Employee",
       "Quit",
     ],
@@ -63,7 +64,34 @@ const showEmployees = () => {
 };
 
 // TODO: Add function to add department
-const addDepartment = () => {};
+const addDepartment = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "newDepartment",
+        message: "New department name:",
+      },
+    ])
+    .then(({ newDepartment }) => {
+      const params = newDepartment;
+      const query = `INSERT INTO departments (name)
+		VALUES (?)`;
+
+      if (newDepartment) {
+        db.query(query, params, (err, result) => {
+          if (err) {
+            console.error(err);
+          }
+          return showOptions();
+        });
+        showOptions();
+      } else {
+        console.error(`\x1b[41m`, "Error: Name cannot be blank.", `\x1b[0m`);
+        showOptions();
+      }
+    });
+};
 // TODO: Add function to add role
 const addRole = () => {};
 // TODO: Add function to add employee
@@ -119,6 +147,9 @@ const showOptions = () => {
         break;
       case "View All Employees":
         showEmployees();
+        break;
+      case "Add Department":
+        addDepartment();
         break;
       case "Remove Employee":
         deleteEmployee();
