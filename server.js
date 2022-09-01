@@ -17,6 +17,7 @@ const questions = [
       "View All Employees",
       "Add Department",
       "Add Role",
+      "Add Employee",
       "Remove Employee",
       "Quit",
     ],
@@ -94,7 +95,6 @@ const addDepartment = () => {
     });
 };
 // function to add role
-//name, salary, and department for the role and that role is added to the database
 const addRole = () => {
   //Get list of departments
   const departments = () =>
@@ -184,9 +184,54 @@ const addRole = () => {
     )
     .catch((err) => console.error(err));
 };
-// TODO: Add function to add employee
-const addEmployee = () => {};
+// role db query
+const getRoles = () => {
+  return new Promise((resolve, reject) => {
+    db.query(`SELECT id, title FROM roles;`, (err, data) => {
+      if (err) {
+        console.error(err);
+      }
+      resolve(data);
+    });
+  }).catch((err) => console.error(err));
+};
+// function to add employee
+//employee’s first name, last name, role, and manager, and that employee is added to the database
+const addEmployee = async () => {
+  //get roles from db
+  let roles = await getRoles();
+  //change roles to array of [id, title]
+  roles = roles.map((data) => {
+    return data.title;
+  });
+  console.log(roles);
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "firstName",
+      message: "Enter first name:",
+    },
+    {
+      type: "input",
+      name: "lastName",
+      message: "Enter last name:",
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "Choose role:",
+      choices: roles, // get roles from db
+    },
+    {
+      type: "list",
+      name: "manager",
+      message: "Choose manager:",
+      choices: "", // get list of employees where manager = null
+    },
+  ]);
+};
 // TODO: Add function to update employee role
+// select an employee to update and their new role and this information is updated in the database
 const updateRole = () => {};
 // Delete Employee from db
 const deleteEmployee = () => {
@@ -243,6 +288,9 @@ const showOptions = () => {
         break;
       case "Add Role":
         addRole();
+        break;
+      case "Add Employee":
+        addEmployee();
         break;
       case "Remove Employee":
         deleteEmployee();
