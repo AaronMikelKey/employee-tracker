@@ -16,6 +16,7 @@ const questions = [
       "View All Roles",
       "View All Employees",
       "Add Department",
+      "Add Role",
       "Remove Employee",
       "Quit",
     ],
@@ -32,7 +33,7 @@ const db = createConnection({
   database: "company",
 });
 
-// TODO: Add function to show all departments
+// function to show all departments
 const showDepartments = () => {
   db.promise()
     .query("SELECT * FROM departments;")
@@ -41,8 +42,7 @@ const showDepartments = () => {
       showOptions();
     });
 };
-// TODO: Add function to show all roles
-//job title, role id, the department that role belongs to, and the salary for that role
+// function to show all roles
 const showRoles = () => {
   db.promise()
     .query(
@@ -63,7 +63,7 @@ const showEmployees = () => {
     });
 };
 
-// TODO: Add function to add department
+// function to add department
 const addDepartment = () => {
   inquirer
     .prompt([
@@ -87,13 +87,103 @@ const addDepartment = () => {
         });
         showOptions();
       } else {
+        // \x1b[41m and [0m change the console color to red and then back to normal
         console.error(`\x1b[41m`, "Error: Name cannot be blank.", `\x1b[0m`);
         showOptions();
       }
     });
 };
-// TODO: Add function to add role
-const addRole = () => {};
+// function to add role
+//name, salary, and department for the role and that role is added to the database
+const addRole = () => {
+  //Get list of departments
+  const departments = () =>
+    db
+      .promise()
+      .query("SELECT * FROM departments;")
+      .then(([rows, fields]) => {
+        return rows;
+      })
+      .then((data) => {
+        return data;
+      });
+
+  departments()
+    .then(
+      //prompt for new dept info
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "newRoleTitle",
+            message: "New role name:",
+          },
+          {
+            type: "input",
+            name: "newRoleSalary",
+            message: "New role's salary:",
+          },
+          {
+            type: "list",
+            name: "newRoleDepartment",
+            message: "Which department is this roll in?",
+            choices: departments,
+          },
+        ])
+        .then((answers) => {
+          //save answers to array
+          let params = [
+            answers.newRoleTitle,
+            answers.newRoleSalary,
+            answers.newRoleDepartment,
+          ];
+          //insert query
+          const query = `INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`;
+
+          //answers !false
+          if (answers.newRoleTitle && answers.newRoleSalary) {
+            //get dept query & id
+            const deptQuery = `SELECT id FROM departments WHERE departments.name = ?`;
+            const department = params[2];
+            //get dept id
+            db.promise()
+              .query(deptQuery, department, (err, result) => {
+                if (err) {
+                  console.error(err);
+                }
+                return result;
+              })
+              .then(([rows, fields]) => {
+                //return intended id
+                return rows[0].id;
+              })
+              .then((data) =>
+                //add to db
+                db
+                  .promise()
+                  .query(query, [params[0], params[1], data], (err, result) => {
+                    if (err) {
+                      console.error(err);
+                    }
+                    return;
+                  })
+                  .catch((err) => console.error(err))
+              )
+              .catch((err) => console.error(err))
+              .finally(() => showOptions());
+          } else {
+            // \x1b[41m and [0m change the console color to red and then back to normal
+            console.error(
+              `\x1b[41m`,
+              "Error: Title or Salary cannot be blank.",
+              `\x1b[0m`
+            );
+            showOptions();
+          }
+        })
+    )
+    .catch((err) => console.error(err));
+};
 // TODO: Add function to add employee
 const addEmployee = () => {};
 // TODO: Add function to update employee role
@@ -150,6 +240,9 @@ const showOptions = () => {
         break;
       case "Add Department":
         addDepartment();
+        break;
+      case "Add Role":
+        addRole();
         break;
       case "Remove Employee":
         deleteEmployee();
