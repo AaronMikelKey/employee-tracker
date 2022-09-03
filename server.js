@@ -195,6 +195,20 @@ const getRoles = () => {
     });
   }).catch((err) => console.error(err));
 };
+
+const getManagers = () => {
+  return new Promise((resolve, reject) => {
+    db.query(
+      `SELECT * from employees WHERE manager_id IS NULL`,
+      (err, data) => {
+        if (err) {
+          console.error(err);
+        }
+        resolve(data);
+      }
+    );
+  }).catch((err) => console.error(err));
+};
 // function to add employee
 //employee’s first name, last name, role, and manager, and that employee is added to the database
 const addEmployee = async () => {
@@ -204,31 +218,62 @@ const addEmployee = async () => {
   roles = roles.map((data) => {
     return data.title;
   });
-  console.log(roles);
-  inquirer.prompt([
-    {
-      type: "input",
-      name: "firstName",
-      message: "Enter first name:",
-    },
-    {
-      type: "input",
-      name: "lastName",
-      message: "Enter last name:",
-    },
-    {
-      type: "list",
-      name: "role",
-      message: "Choose role:",
-      choices: roles, // get roles from db
-    },
-    {
-      type: "list",
-      name: "manager",
-      message: "Choose manager:",
-      choices: "", // get list of employees where manager = null
-    },
-  ]);
+  //get managers (ie employees where manager id = null)
+  let managers = await getManagers();
+  //change managers to array of [id, title]
+  managers = managers.map((data) => {
+    return data.first_name + " " + data.last_name;
+  });
+  console.log(managers);
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "firstName",
+        message: "Enter first name:",
+      },
+      {
+        type: "input",
+        name: "lastName",
+        message: "Enter last name:",
+      },
+      {
+        type: "list",
+        name: "role",
+        message: "Choose role:",
+        choices: roles, // get roles from db
+      },
+      {
+        type: "list",
+        name: "manager",
+        message: "Choose manager:",
+        choices: managers, // get list of employees where manager = null
+      },
+    ])
+    .then((answers) => {
+      const params = [answers.firstName, answers.lastName, answers.role];
+      if (answers.manager !== "None") {
+        const managerName = answers.manager;
+        const queryManager = `SELECT id FROM employees WHERE CONCAT(first_name, ' ', last_name) = ?`;
+        db.promise().query(queryManager, managerName, (err, result) => {
+          if (err) {
+            console.error(err);
+          }
+          params.push(result);
+        });
+        return params;
+      }
+    })
+    .then((params) => {
+      const query = `INSERT INTO employees (first_name, last_name, role_id, manager_id)`;
+      const info = params;
+      db.promise().query(query, info, (err, result) => {
+        if (err) {
+          console.error(err);
+        }
+        return;
+      });
+    });
 };
 // TODO: Add function to update employee role
 // select an employee to update and their new role and this information is updated in the database
