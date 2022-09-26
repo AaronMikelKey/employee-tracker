@@ -18,6 +18,7 @@ const questions = [
       "Add Department",
       "Add Role",
       "Add Employee",
+      "Update Employee Role",
       "Remove Employee",
       "Quit",
     ],
@@ -210,7 +211,6 @@ const getManagers = () => {
   }).catch((err) => console.error(err));
 };
 // function to add employee
-//employee’s first name, last name, role, and manager, and that employee is added to the database
 const addEmployee = async () => {
   //get roles from db
   let roles = await getRoles();
@@ -300,7 +300,6 @@ const addEmployee = async () => {
     // insert data into db
     .then((data) => {
       const params = data;
-      console.log("params", params);
       const query = `INSERT INTO employees (first_name, last_name, role_id, department_id, manager_id) VALUES (?,?,?,?,?)`;
       db.promise().query(query, params, (err, result) => {
         if (err) {
@@ -314,7 +313,60 @@ const addEmployee = async () => {
 };
 // TODO: Add function to update employee role
 // select an employee to update and their new role and this information is updated in the database
-const updateRole = () => {};
+
+const updateRole = async () => {
+  db.promise()
+    .query("SELECT * FROM employees;")
+    .then(([row, fields]) => {
+      const choices = row.map(({ id, first_name, last_name }) => {
+        return {
+          name: `${first_name} ${last_name}`,
+          value: id,
+        };
+      });
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "employeeId",
+            message: "Which employee would you like to update?",
+            choices: choices,
+          },
+        ])
+        .then(({ employeeId }) => {
+          employeeId = employeeId;
+          db.promise()
+            .query("SELECT * FROM roles")
+            .then(([row, fields]) => {
+              const roleChoices = row.map(({ id, title }) => {
+                return { name: title, value: id };
+              });
+              inquirer
+                .prompt([
+                  {
+                    type: "list",
+                    name: "role",
+                    message: "What is the new role?",
+                    choices: roleChoices,
+                  },
+                ])
+                .then(({ role }) => {
+                  db.query(
+                    `UPDATE employees SET role_id = ? WHERE id = ?`,
+                    [role, employeeId],
+                    (err, result) => {
+                      if (err) {
+                        console.error(err);
+                      }
+                      showOptions();
+                    }
+                  );
+                });
+            });
+        });
+    });
+};
+
 // Delete Employee from db
 const deleteEmployee = () => {
   db.promise()
@@ -342,9 +394,8 @@ const deleteEmployee = () => {
             employeeId,
             (err, result) => {
               if (err) {
-                console.log(err);
+                console.error(err);
               }
-              console.log(result);
               showOptions();
             }
           );
@@ -373,6 +424,9 @@ const showOptions = () => {
         break;
       case "Add Employee":
         addEmployee();
+        break;
+      case "Update Employee Role":
+        updateRole();
         break;
       case "Remove Employee":
         deleteEmployee();
