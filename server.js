@@ -58,7 +58,17 @@ const showRoles = () => {
 // Show employees query
 const showEmployees = () => {
   db.promise()
-    .query("SELECT * FROM employees;")
+    .query(
+      `SELECT employees.id AS ID,
+				 CONCAT(first_name, ' ', last_name) AS Name, 
+				 roles.title AS Title, 
+				 roles.salary as Salary, 
+				 departments.name as Department
+				 employees.manager_id
+			 FROM employees 
+			 LEFT JOIN roles ON employees.role_id = roles.id 
+			 LEFT JOIN departments on departments.id = roles.department_id`
+    )
     .then(([rows, fields]) => {
       console.table(rows);
       showOptions();
