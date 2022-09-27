@@ -48,7 +48,7 @@ const showDepartments = () => {
 const showRoles = () => {
   db.promise()
     .query(
-      "SELECT * FROM roles LEFT JOIN departments ON roles.department_id = departments.id;"
+      "SELECT title AS Title, roles.id AS ID, salary AS Salary, departments.name AS Department FROM roles INNER JOIN departments ON roles.department_id = departments.id"
     )
     .then(([rows, fields]) => {
       console.table(rows);
