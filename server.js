@@ -27,12 +27,12 @@ const questions = [
 
 // Connect to database
 const db = createConnection({
-	host: 'localhost',
+	host: process.env.DB_HOST || 'localhost',
 	// MySQL username,
-	user: 'root',
+	user: process.env.DB_USERNAME || 'root',
 	// MySQL password
 	password: process.env.DB_PASSWORD,
-	database: 'company',
+	database: process.env.DB_NAME || 'company',
 })
 
 // function to show all departments
@@ -167,18 +167,22 @@ const addRole = () => {
 							})
 							.then(([rows, fields]) => {
 								//return intended id
-								return rows[0].id
+								return (params[2] = rows[0].id)
 							})
 							.then((data) =>
 								//add to db
 								db
 									.promise()
-									.query(query, [params[0], params[1], data], (err, result) => {
-										if (err) {
-											console.error(err)
+									.query(
+										query,
+										[params[0], params[1], params[2]],
+										(err, result) => {
+											if (err) {
+												console.error(err)
+											}
+											return
 										}
-										return
-									})
+									)
 									.catch((err) => console.error(err))
 							)
 							.catch((err) => console.error(err))
